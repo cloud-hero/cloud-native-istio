@@ -1,0 +1,73 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: colour-vs-public
+  namespace: colour
+spec:
+  gateways:
+  - colour-gw-public
+  hosts:
+  - colour.ko2.com
+  http:
+  - route:
+    - destination:
+        host: green-svc-ci.colour.svc.cluster.local
+        port:
+          number: 80
+      weight: 100
+
+---
+
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: colour-vs-internal
+  namespace: colour
+spec:
+  gateways:
+  - colour-gw-internal
+  hosts:
+  - colour.ko2.com
+  http:
+  - route:
+    - destination:
+        host: red-svc-ci.colour.svc.cluster.local
+        port:
+          number: 80
+      weight: 100
+
+---
+
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: colour-gw-public
+  namespace: colour
+spec:
+  selector:
+    istio: public-ingressgateway-awsdemo
+  servers:
+  - hosts:
+    - colour.ko2.com
+    port:
+      name: http
+      number: 80
+      protocol: HTTP
+
+---
+
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: colour-gw-internal
+  namespace: colour
+spec:
+  selector:
+    istio: internal-ingressgateway-awsdemo
+  servers:
+  - hosts:
+    - colour.ko2.com
+    port:
+      name: http
+      number: 80
+      protocol: HTTP
